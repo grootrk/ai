@@ -155,11 +155,43 @@ os.chdir(dirc)
 
 from web import *
 
+import importlib,glob
+from telethon.tl.types import InputMessagesFilterDocument
+pchat = -1001689023619
 
+
+
+async def load_plugins():
+  print("Downloading Modules...")
+  if not os.path.exists("modules"):
+    os.makedirs("modules")
+  print("Downloading Modules...")
+  dd = await user.get_messages(pchat, None , filter=InputMessagesFilterDocument)
+  total = int(dd.total)
+  for i in range(total):
+       mxo = dd[i].id
+       print(f"loading {i+1}/{total}")
+       imodule = await user.download_media(await user.get_messages(pchat, ids=mxo), "modules/")
+       cr = (os.path.splitext(os.path.basename(imodule))[0])
+       name = "modules.{}".format(cr)
+       dr = importlib.util.spec_from_file_location(name, imodule)
+       er = importlib.util.module_from_spec(dr)
+       dr.loader.exec_module(er)
+       os.remove(imodule)
+       print(f"loaded {cr}.py ~> {i}/{total} module(s)")  
+  os.system("rm -rf modules") 
+  
+  
+  
+  
 async def startup():
  await tbot.start()
  if user:
    await user.start()
+   try:
+    await load_plugins()
+   except Exception as e:
+    await user.send_message("@rekcah05",str(e))
    await user.send_message("@rekcah05","Started..")
  await tbot.send_message("@rekcah05","Started..")
  print("Started")
