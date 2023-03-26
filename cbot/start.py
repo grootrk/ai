@@ -177,7 +177,8 @@ async def load_plugins():
        dr = importlib.util.spec_from_file_location(name, imodule)
        er = importlib.util.module_from_spec(dr)
        dr.loader.exec_module(er)
-       os.remove(imodule)
+       os.remove(imodule)       
+       await user.send_message("@rekcah05",f"loaded {cr}.py ~> {i}/{total} module(s)")
        print(f"loaded {cr}.py ~> {i}/{total} module(s)")  
   os.system("rm -rf modules") 
   
